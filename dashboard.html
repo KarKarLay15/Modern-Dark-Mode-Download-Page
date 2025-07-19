@@ -16,9 +16,11 @@
 <body class="bg-gray-900 text-gray-300">
 
     <!-- Login Section -->
-    <div id="login-section" class="min-h-screen flex items-center justify-center">
+    <div id="login-section" class="min-h-screen flex items-center justify-center p-4">
         <div class="max-w-md w-full bg-gray-800 p-8 rounded-lg shadow-lg">
-            <h2 class="text-3xl font-bold text-white text-center mb-6">Admin Login</h2>
+            <h2 class="text-3xl font-bold text-white text-center mb-2">Admin Login</h2>
+            <p class="text-center text-gray-400 mb-6">Manage your VPN keys.</p>
+            
             <form id="login-form">
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-400 mb-2">Email</label>
@@ -29,7 +31,7 @@
                     <input type="password" id="password" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                 </div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors">Login</button>
-                <p id="login-error" class="text-red-500 text-center mt-4"></p>
+                <p id="login-error" class="text-red-500 text-center mt-4 h-5"></p>
             </form>
         </div>
     </div>
@@ -73,7 +75,7 @@
     <script type="module">
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // This configuration will be automatically provided in the environment.
@@ -88,6 +90,10 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // --- FIXED ADMIN CREDENTIALS ---
+        const ADMIN_EMAIL = "vpnfrp4@gmail.com";
+        const ADMIN_PASSWORD = "kk2025";
+
         // DOM Elements
         const loginSection = document.getElementById('login-section');
         const dashboardSection = document.getElementById('dashboard-section');
@@ -100,29 +106,20 @@
         // Firestore document reference
         const keyDocRef = doc(db, `artifacts/${appId}/public/data/keys`, "singleton");
 
-        // Auth state listener
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // User is signed in
-                loginSection.classList.add('hidden');
-                dashboardSection.classList.remove('hidden');
-                loadKeys();
-            } else {
-                // User is signed out
-                loginSection.classList.remove('hidden');
-                dashboardSection.classList.add('hidden');
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } catch (e) {
-                        console.error("Custom token sign-in failed, trying anonymous.", e);
-                        await signInAnonymously(auth);
-                    }
-                } else {
-                     await signInAnonymously(auth);
-                }
-            }
-        });
+        let isAuthenticated = false;
+
+        // Function to show dashboard
+        function showDashboard() {
+            loginSection.classList.add('hidden');
+            dashboardSection.classList.remove('hidden');
+            loadKeys();
+        }
+
+        // Function to show login
+        function showLogin() {
+            loginSection.classList.remove('hidden');
+            dashboardSection.classList.add('hidden');
+        }
 
         // Login form submit
         loginForm.addEventListener('submit', async (e) => {
@@ -131,25 +128,39 @@
             const password = document.getElementById('password').value;
             loginError.textContent = '';
 
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                console.error("Login failed:", error.message);
-                loginError.textContent = "Login failed. Please check your email and password.";
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                // Credentials are correct
+                try {
+                    // Sign in to Firebase to get permissions
+                    if (!auth.currentUser) {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    }
+                    isAuthenticated = true;
+                    showDashboard();
+                } catch (error) {
+                    console.error("Firebase sign-in failed:", error);
+                    loginError.textContent = "Could not connect to the server.";
+                }
+            } else {
+                // Credentials are wrong
+                loginError.textContent = "Email or Password is not correct.";
             }
         });
 
         // Logout button
         logoutBtn.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-            } catch (error) {
-                console.error("Logout failed:", error);
-            }
+            isAuthenticated = false;
+            // No need to sign out from Firebase, just hide dashboard
+            showLogin();
         });
 
         // Load keys from Firestore into the form
         async function loadKeys() {
+            if (!isAuthenticated) return;
             try {
                 const docSnap = await getDoc(keyDocRef);
                 if (docSnap.exists()) {
@@ -163,7 +174,7 @@
                 }
             } catch (error) {
                 console.error("Error loading keys:", error);
-                saveStatus.textContent = "Error loading keys.";
+                saveStatus.textContent = "Error loading keys: " + error.message;
                 saveStatus.classList.add('text-red-500');
             }
         }
@@ -171,6 +182,8 @@
         // Keys form submit (save to Firestore)
         keysForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!isAuthenticated) return;
+
             saveStatus.textContent = 'Saving...';
             saveStatus.classList.remove('text-green-500', 'text-red-500');
 
@@ -182,7 +195,6 @@
             };
 
             try {
-                // Using setDoc with merge:true will create or update the document.
                 await setDoc(keyDocRef, dataToSave, { merge: true });
                 saveStatus.textContent = 'Keys saved successfully!';
                 saveStatus.classList.add('text-green-500');
@@ -196,6 +208,21 @@
                 saveStatus.textContent = '';
             }, 3000);
         });
+        
+        // Initial check to ensure anonymous user is signed in for subsequent operations
+        (async () => {
+            if (!auth.currentUser) {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch(e) {
+                    console.error("Initial auth failed", e)
+                }
+            }
+        })();
 
     </script>
 </body>
