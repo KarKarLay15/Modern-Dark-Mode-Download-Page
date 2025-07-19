@@ -173,7 +173,7 @@
                     <h3 class="font-bold text-xl text-white">Express VPN - PC Activation Key</h3>
                 </div>
                 <div class="flex items-center bg-gray-900/50 rounded-lg p-3">
-                    <code id="express-pc-key" class="text-yellow-400 font-mono text-sm md:text-base flex-grow">YOUR-EXPRESS-PC-KEY-HERE</code>
+                    <code id="express-pc-key" class="text-yellow-400 font-mono text-sm md:text-base flex-grow">Loading...</code>
                     <button class="copy-btn ml-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm" data-clipboard-target="#express-pc-key">
                         <i class="fas fa-copy mr-2"></i>Copy
                     </button>
@@ -189,14 +189,14 @@
                 <div class="space-y-3">
                     <div class="flex items-center bg-gray-900/50 rounded-lg p-3">
                         <span class="font-semibold text-gray-400 w-24">Email:</span>
-                        <code id="express-mobile-email" class="text-purple-300 font-mono text-sm md:text-base flex-grow">signin-email@example.com</code>
+                        <code id="express-mobile-email" class="text-purple-300 font-mono text-sm md:text-base flex-grow">Loading...</code>
                         <button class="copy-btn ml-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-lg text-sm" data-clipboard-target="#express-mobile-email">
                             <i class="fas fa-copy mr-2"></i>Copy
                         </button>
                     </div>
                      <div class="flex items-center bg-gray-900/50 rounded-lg p-3">
                         <span class="font-semibold text-gray-400 w-24">Password:</span>
-                        <code id="express-mobile-pw" class="text-purple-300 font-mono text-sm md:text-base flex-grow">YourPassword123</code>
+                        <code id="express-mobile-pw" class="text-purple-300 font-mono text-sm md:text-base flex-grow">Loading...</code>
                         <button class="copy-btn ml-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-4 py-2 rounded-lg text-sm" data-clipboard-target="#express-mobile-pw">
                             <i class="fas fa-copy mr-2"></i>Copy
                         </button>
@@ -211,7 +211,7 @@
                     <h3 class="font-bold text-xl text-white">Outline VPN Key</h3>
                 </div>
                 <div class="flex items-center bg-gray-900/50 rounded-lg p-3">
-                    <code id="outline-key" class="text-green-300 font-mono text-sm md:text-base flex-grow break-all">ss://YOUR-OUTLINE-KEY-HERE-VERY-LONG-KEY</code>
+                    <code id="outline-key" class="text-green-300 font-mono text-sm md:text-base flex-grow break-all">Loading...</code>
                     <button class="copy-btn ml-4 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg text-sm" data-clipboard-target="#outline-key">
                         <i class="fas fa-copy mr-2"></i>Copy
                     </button>
@@ -325,7 +325,22 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    // Firebase Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // This configuration will be automatically provided in the environment.
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+        ? JSON.parse(__firebase_config)
+        : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID", storageBucket: "YOUR_STORAGE_BUCKET", messagingSenderId: "YOUR_SENDER_ID", appId: "YOUR_APP_ID" };
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     window.onload = function() {
         // --- Hide Preloader ---
         const preloader = document.getElementById('preloader');
@@ -333,8 +348,37 @@
             preloader.style.opacity = '0';
             setTimeout(() => {
                 preloader.style.display = 'none';
-            }, 500); // Match transition duration
+            }, 500);
         }
+
+        // --- Fetch and Populate Free Keys from Firebase ---
+        function listenForKeys() {
+            const keyDocRef = doc(db, `artifacts/${appId}/public/data/keys`, "singleton");
+            
+            onSnapshot(keyDocRef, (doc) => {
+                if (doc.exists()) {
+                    const keys = doc.data();
+                    document.getElementById('express-pc-key').textContent = keys.expressPcKey || 'Not Available';
+                    document.getElementById('express-mobile-email').textContent = keys.expressMobileEmail || 'Not Available';
+                    document.getElementById('express-mobile-pw').textContent = keys.expressMobilePassword || 'Not Available';
+                    document.getElementById('outline-key').textContent = keys.outlineKey || 'Not Available';
+                } else {
+                    console.log("No key document found!");
+                    document.getElementById('express-pc-key').textContent = 'Not set up';
+                    document.getElementById('express-mobile-email').textContent = 'Not set up';
+                    document.getElementById('express-mobile-pw').textContent = 'Not set up';
+                    document.getElementById('outline-key').textContent = 'Not set up';
+                }
+            }, (error) => {
+                console.error("Error listening to key document:", error);
+                document.getElementById('express-pc-key').textContent = 'Error loading key.';
+                document.getElementById('express-mobile-email').textContent = 'Error loading email.';
+                document.getElementById('express-mobile-pw').textContent = 'Error loading password.';
+                document.getElementById('outline-key').textContent = 'Error loading key.';
+            });
+        }
+        listenForKeys();
+
 
         // --- Data for Modals ---
         const drivers = [
