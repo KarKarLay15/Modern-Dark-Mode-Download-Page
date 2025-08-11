@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang=my>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Admin - Download Management</title>
+<script src=https://cdn.tailwindcss.com></script>
+<link rel=preconnect href=https://fonts.googleapis.com>
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel=stylesheet>
+<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css>
+<style>body{font-family:Inter,sans-serif;background-color:#0b1120;color:#d1d5db}.glass-effect{background:rgba(17,24,39,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1)}.btn{padding:.5rem 1rem;border-radius:.5rem;font-weight:600;transition:background-color .2s}.btn-primary{background-color:#4f46e5;color:#fff}.btn-primary:hover{background-color:#4338ca}.btn-secondary{background-color:#374151;color:#fff}.btn-secondary:hover{background-color:#4b5563}.btn-danger{background-color:#dc2626;color:#fff}.btn-danger:hover{background-color:#b91c1c}.modal{display:none}.modal.active{display:flex}</style>
+</head>
+<body class="p-4 md:p-8">
+<div class="max-w-4xl mx-auto">
+<header class="text-center mb-8">
+<h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-2">Download Management Page</h1>
+<p class=text-gray-400>ဤစာမျက်နှာမှ <code>downloads.json</code> ဖိုင်ကို စီမံခန့်ခွဲနိုင်ပါသည်။</p>
+</header>
+<div class="glass-effect p-6 rounded-xl mb-8">
+<h2 class="text-xl font-bold mb-4 text-white">အသုံးပြုနည်း အဆင့်ဆင့်</h2>
+<ol class="list-decimal list-inside space-y-2 text-gray-300">
+<li><strong class="font-semibold text-white">Load File:</strong> အောက်ကခလုတ်ကိုနှိပ်ပြီး သင့်ကွန်ပျူတာထဲမှာရှိတဲ့ <code>downloads.json</code> ဖိုင်ကို ရွေးချယ်ထည့်သွင်းပါ။</li>
+<li><strong class="font-semibold text-white">Manage:</strong> Link များကို အသစ်ထည့်ခြင်း၊ ပြင်ဆင်ခြင်း၊ ဖျက်ခြင်းများ ပြုလုပ်ပါ။</li>
+<li><strong class="font-semibold text-white">Save/Upload:</strong> အားလုံးပြင်ဆင်ပြီးပါက အောက်ဆုံးမှ ခလုတ်များမှတစ်ဆင့် Firebase သို့ တိုက်ရိုက်သိမ်းပါ။</li>
+</ol>
+<div class=mt-6>
+<label for=json-uploader class="btn btn-primary cursor-pointer">
+<i class="fas fa-upload mr-2"></i>Load <code>downloads.json</code> File
+</label>
+<input type=file id=json-uploader class=hidden accept=.json>
+</div>
+</div>
+<div id=auth-panel class="glass-effect p-4 rounded-xl mb-6 flex flex-col md:flex-row items-center gap-3">
+<div class="flex items-center gap-2">
+<input id=auth-email type=email placeholder=admin@email.com class="bg-slate-800/60 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+<input id=auth-password type=password placeholder=•••••••• class="bg-slate-800/60 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+</div>
+<div class="flex items-center gap-2">
+<button id=btn-sign-in class="btn btn-primary"><i class="fas fa-sign-in-alt mr-2"></i>Sign in</button>
+<button id=btn-sign-out class="btn btn-secondary hidden"><i class="fas fa-sign-out-alt mr-2"></i>Sign out</button>
+</div>
+<span id=auth-info class="text-sm text-gray-300"></span>
+</div>
+<main id=management-container class=space-y-4>
+<div class="text-center p-8 border-2 border-dashed border-gray-600 rounded-xl">
+<p class=text-gray-400><code>downloads.json</code> ဖိုင်ကို အရင် load လုပ်ပါ။</p>
+</div>
+</main>
+<footer class="mt-8 text-center" id=save-section>
+<div class="flex flex-col md:flex-row items-center justify-center gap-3">
+<button id=load-from-server class="btn btn-secondary">
+<i class="fas fa-cloud-download-alt mr-2"></i>Load from Server
+</button>
+<button id=save-to-server class="btn btn-primary">
+<i class="fas fa-cloud-upload-alt mr-2"></i>Save to Server
+</button>
+<button id=save-and-download class="btn btn-secondary">
+<i class="fas fa-download mr-2"></i>Download JSON
+</button>
+</div>
+<p id=server-status class="text-xs text-gray-400 mt-2"></p>
+</footer>
+</div>
+<div id=edit-modal class="modal fixed inset-0 bg-black/70 items-center justify-center p-4">
+<div class="glass-effect rounded-2xl shadow-xl w-full max-w-2xl flex flex-col">
+<header class="p-5 border-b border-slate-700 flex justify-between items-center">
+<h2 id=modal-title class="text-xl font-bold text-white">Edit Item</h2>
+<button id=close-modal class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+</header>
+<main class="p-6 space-y-4">
+<input type=hidden id=edit-index>
+<div>
+<label for=edit-name class="block mb-1 font-semibold text-sm">Name</label>
+<input id=edit-name class="w-full bg-slate-800 border border-slate-600 rounded-md p-2 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+</div>
+<div>
+<label for=edit-description class="block mb-1 font-semibold text-sm">Description</label>
+<input id=edit-description class="w-full bg-slate-800 border border-slate-600 rounded-md p-2 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+</div>
+<div>
+<label for=edit-category class="block mb-1 font-semibold text-sm">Category</label>
+<select id=edit-category class="w-full bg-slate-800 border border-slate-600 rounded-md p-2 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+<option value=vpn>VPN & Network Tools</option>
+<option value=mobile>Mobile & System Tools</option>
+</select>
+</div>
+<div>
+<label for=edit-icon class="block mb-1 font-semibold text-sm">Icon (Font Awesome Class)</label>
+<input id=edit-icon placeholder="e.g., fas fa-rocket, fab fa-android" class="w-full bg-slate-800 border border-slate-600 rounded-md p-2 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+</div>
+<div>
+<label for=edit-color class="block mb-1 font-semibold text-sm">Color</label>
+<select id=edit-color class="w-full bg-slate-800 border border-slate-600 rounded-md p-2 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+<option value=blue>Blue</option><option value=slate>Slate</option><option value=yellow>Yellow</option><option value=red>Red</option><option value=indigo>Indigo</option><option value=teal>Teal</option><option value=green>Green</option><option value=orange>Orange</option><option value=cyan>Cyan</option><option value=rose>Rose</option><option value=lime>Lime</option><option value=purple>Purple</option>
+</select>
+</div>
+<div>
+<label class="block mb-1 font-semibold text-sm">Button Type</label>
+<div class="flex space-x-4">
+<label><input type=radio name=buttonType value=url checked> Direct Download</label>
+<label><input type=radio name=buttonType value=modal> Modal Popup</label>
+</div>
+</div>
+<div id=url-input-container>
+<label for=edit-url class="block mb-1 font-semibold text-sm">Download URL</label>
+<input id=edit-url class="w-full bg-slate-800 border border-slate-600 rounded-md p-2 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+</div>
+<div id=modal-input-container class=hidden>
+<label for=edit-modal-target class="block mb-1 font-semibold text-sm">Modal Target ID</label>
+<input id=edit-modal-target placeholder="e.g., driversModal" class="w-full bg-slate-800 border border-slate-600 rounded-md p-2 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+</div>
+</main>
+<footer class="p-4 bg-slate-800/50 text-right">
+<button id=save-changes class="btn btn-primary">Save Changes</button>
+</footer>
+</div>
+</div>
+<script>
+// ======= Local editor (non-module) =======
+  let downloadData = [];
+  const uploader = document.getElementById('json-uploader');
+  const container = document.getElementById('management-container');
+  const saveSection = document.getElementById('save-section');
+  const modal = document.getElementById('edit-modal');
+
+  // Load a local downloads.json
+  uploader.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.downloadItems && Array.isArray(data.downloadItems)) {
+          downloadData = data.downloadItems;
+          renderItems();
+          saveSection.classList.remove('hidden');
+        } else {
+          alert('Error: Invalid JSON format. Make sure it has a "downloadItems" array.');
+        }
+      } catch (err) {
+        alert('Error reading or parsing JSON file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // Render list
+  function renderItems() {
+    container.innerHTML = '';
+    container.insertAdjacentHTML('beforeend', \`
+      <div class="text-center">
+        <button id="add-new-btn" class="btn btn-primary w-full md:w-auto"><i class="fas fa-plus mr-2"></i>Add New Download Item</button>
+      </div>\`
+    );
+    const listContainer = document.createElement('div');
+    listContainer.className = 'space-y-3 mt-4';
+    (downloadData || []).forEach((item, index) => {
+      const itemEl = document.createElement('div');
+      itemEl.className = 'glass-effect p-4 rounded-lg flex items-center justify-between';
+      itemEl.innerHTML = \`
+        <div class="flex items-center space-x-4">
+          <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-\${item.color}-500/10 text-\${item.color}-400 text-xl">
+            <i class="\${item.icon}"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white">\${item.name}</h3>
+            <p class="text-sm text-gray-400">\${item.description || ''}</p>
+          </div>
+        </div>
+        <div class="flex-shrink-0 space-x-2">
+          <button class="btn btn-secondary edit-btn" data-index="\${index}"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger delete-btn" data-index="\${index}"><i class="fas fa-trash"></i></button>
+        </div>\`;
+      listContainer.appendChild(itemEl);
+    });
+    container.appendChild(listContainer);
+    attachEventListeners();
+  }
+
+  function attachEventListeners() {
+    document.getElementById('add-new-btn')?.addEventListener('click', handleAddNew);
+    document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', handleEdit));
+    document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', handleDelete));
+  }
+
+  // Add/Edit/Delete
+  function handleAddNew() {
+    document.getElementById('edit-modal-form').reset();
+    document.getElementById('edit-index').value = '-1';
+    document.getElementById('modal-title').textContent = 'Add New Item';
+    toggleButtonTypeFields('url');
+    showModal();
+  }
+  function handleDelete(event) {
+    const index = event.currentTarget.dataset.index;
+    if (confirm(\`Are you sure you want to delete "\${downloadData[index].name}"?\`)) {
+      downloadData.splice(index, 1);
+      renderItems();
+    }
+  }
+  function handleEdit(event) {
+    const index = event.currentTarget.dataset.index;
+    const item = downloadData[index];
+    document.getElementById('edit-index').value = index;
+    document.getElementById('modal-title').textContent = 'Edit Item';
+    document.getElementById('edit-name').value = item.name || '';
+    document.getElementById('edit-description').value = item.description || '';
+    document.getElementById('edit-category').value = item.category || 'vpn';
+    document.getElementById('edit-icon').value = item.icon || '';
+    document.getElementById('edit-color').value = item.color || 'blue';
+    if (item.url) {
+      document.querySelector('input[name="buttonType"][value="url"]').checked = true;
+      document.getElementById('edit-url').value = item.url;
+      toggleButtonTypeFields('url');
+    } else if (item.button) {
+      document.querySelector('input[name="buttonType"][value="modal"]').checked = true;
+      document.getElementById('edit-modal-target').value = item.button.target || '';
+      toggleButtonTypeFields('modal');
+    }
+    showModal();
+  }
+
+  // Modal mechanics
+  document.getElementById('save-changes').addEventListener('click', () => {
+    const index = document.getElementById('edit-index').value;
+    const buttonType = document.querySelector('input[name="buttonType"]:checked').value;
+    const newItemData = {
+      name: document.getElementById('edit-name').value,
+      description: document.getElementById('edit-description').value,
+      category: document.getElementById('edit-category').value,
+      icon: document.getElementById('edit-icon').value,
+      color: document.getElementById('edit-color').value
+    };
+    if (buttonType === 'url') {
+      newItemData.url = document.getElementById('edit-url').value;
+    } else {
+      newItemData.button = { type: 'modal', target: document.getElementById('edit-modal-target').value };
+    }
+    if (index === '-1') downloadData.push(newItemData); else downloadData[index] = newItemData;
+    hideModal();
+    renderItems();
+  });
+  document.getElementById('close-modal').addEventListener('click', hideModal);
+  document.querySelectorAll('input[name="buttonType"]').forEach(radio => {
+    radio.addEventListener('change', (e) => toggleButtonTypeFields(e.target.value));
+  });
+  function toggleButtonTypeFields(selected) {
+    if (selected === 'url') {
+      document.getElementById('url-input-container').classList.remove('hidden');
+      document.getElementById('modal-input-container').classList.add('hidden');
+    } else {
+      document.getElementById('url-input-container').classList.add('hidden');
+      document.getElementById('modal-input-container').classList.remove('hidden');
+    }
+  }
+  function showModal() { modal.classList.add('active'); }
+  function hideModal() { modal.classList.remove('active'); }
+
+  // Download JSON (manual backup)
+  document.getElementById('save-and-download').addEventListener('click', () => {
+    if ((downloadData || []).length === 0) { alert('No data to save.'); return; }
+    const jsonString = JSON.stringify({ downloadItems: downloadData }, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'downloads.json'; document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  });
+
+  // Dummy form wrapper (prevents enter submit)
+  const dummyForm = document.createElement('form');
+  dummyForm.id = 'edit-modal-form';
+  dummyForm.addEventListener('submit', (e) => e.preventDefault());
+  const modalMain = document.querySelector('#edit-modal main');
+  const modalFooter = document.querySelector('#edit-modal footer');
+  modal.querySelector('main').parentNode.insertBefore(dummyForm, modalMain);
+  dummyForm.appendChild(modalMain);
+  dummyForm.appendChild(modalFooter);
+</script>
+<script type=module>import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";import{getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";import{getStorage,ref,getDownloadURL,uploadString}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";const firebaseConfig={apiKey:"AIzaSyDTdTEUEnIJmzKt3JhwYQoEtV_D0LoGEI0",authDomain:"kkfile-data.firebaseapp.com",databaseURL:"https://kkfile-data-default-rtdb.firebaseio.com",projectId:"kkfile-data",storageBucket:"kkfile-data.firebasestorage.app",messagingSenderId:"71486245730",appId:"1:71486245730:web:831d8e86d99cb3b0e9fa3b"},app=initializeApp(firebaseConfig),storage=getStorage(app),auth=getAuth(app),STORAGE_PATH="site/downloads.json",serverStatusEl=document.getElementById("server-status"),saveSectionEl=document.getElementById("save-section"),emailEl=document.getElementById("auth-email"),passEl=document.getElementById("auth-password"),btnIn=document.getElementById("btn-sign-in"),btnOut=document.getElementById("btn-sign-out"),infoEl=document.getElementById("auth-info");async function loadFromServer(){try{const e=await getDownloadURL(ref(storage,STORAGE_PATH)),t=await fetch(e+"?v="+Date.now());if(!t.ok)throw new Error("HTTP "+t.status);const a=await t.json();a.downloadItems&&Array.isArray(a.downloadItems)?(window.downloadData=a.downloadItems,"function"==typeof renderItems&&renderItems(),saveSectionEl?.classList.remove("hidden"),serverStatusEl.textContent="Loaded from server."):alert("Invalid JSON shape from server.")}catch(e){console.error(e),alert("Load from server failed: "+e.message+"\nIf this is the first time, click 'Save to Server' to create the file.")}}async function saveToServer(){if(auth.currentUser)try{const e=JSON.stringify({downloadItems:window.downloadData||[]},null,2),t=ref(storage,STORAGE_PATH);await uploadString(t,e,"raw",{contentType:"application/json; charset=utf-8",cacheControl:"no-cache, max-age=0"}),serverStatusEl.textContent="Saved to server ✔"}catch(e){console.error(e),alert("Save failed: "+e.message)}else alert("Please sign in first.")}btnIn?.addEventListener("click",(async()=>{try{await signInWithEmailAndPassword(auth,(emailEl?.value||"").trim(),passEl?.value||"")}catch(e){alert("Sign-in failed: "+e.message)}})),btnOut?.addEventListener("click",(()=>signOut(auth))),onAuthStateChanged(auth,(e=>{e?(infoEl.textContent=`Signed in as ${e.email}`,btnIn?.classList.add("hidden"),btnOut?.classList.remove("hidden")):(infoEl.textContent="Not signed in",btnOut?.classList.add("hidden"),btnIn?.classList.remove("hidden"))})),document.getElementById("load-from-server")?.addEventListener("click",loadFromServer),document.getElementById("save-to-server")?.addEventListener("click",saveToServer)</script>
+</body>
+</html>
