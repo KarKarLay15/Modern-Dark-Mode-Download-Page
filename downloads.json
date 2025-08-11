@@ -1,0 +1,171 @@
+{
+  "downloadItems": [
+    {
+      "category": "vpn",
+      "name": "Express VPN",
+      "description": "PC နှင့် Laptop များအတွက် Windows VPN။",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/expressvpn_windows_12.103.0.22_release.exe?alt=media&token=f34ce7aa-b472-4d83-86f3-1bc8ce76c16f",
+      "icon": "fab fa-windows",
+      "color": "blue"
+    },
+    {
+      "category": "vpn",
+      "name": "Express VPN",
+      "description": "Mac ကွန်ပျူတာများအတွက် VPN။",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/expressvpn_mac_11.70.0.90675_release.pkg?alt=media&token=d98b66aa-d640-4207-ac50-d003e2090014",
+      "icon": "fab fa-apple",
+      "color": "slate"
+    },
+    {
+      "category": "vpn",
+      "name": "Outline Client",
+      "description": "Windows အတွက် Outline Client App။",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/Outline-Client.exe?alt=media&token=931263f4-9c93-4ba8-b99a-8c078971d7c3",
+      "icon": "fas fa-desktop",
+      "color": "yellow"
+    },
+    {
+      "category": "mobile",
+      "name": "All Mobile Drivers",
+      "description": "UnlockTool မှ Mobile Driver မျိုးစုံ။",
+      "button": {
+        "type": "modal",
+        "target": "driversModal"
+      },
+      "icon": "fas fa-mobile-alt",
+      "color": "red"
+    },
+    {
+      "category": "mobile",
+      "name": "All iPhone Ramdisk",
+      "description": "iPhoneအတွက် Ramdisk ဖိုင်များ။",
+      "button": {
+        "type": "modal",
+        "target": "ramdiskModal"
+      },
+      "icon": "fab fa-apple",
+      "color": "indigo"
+    },
+    {
+      "category": "mobile",
+      "name": "SP Flash Tool",
+      "description": "MediaTek (MTK) Flashing Tool",
+      "button": {
+        "type": "modal",
+        "target": "spFlashToolModal"
+      },
+      "icon": "fas fa-microchip",
+      "color": "teal"
+    },
+    {
+      "category": "mobile",
+      "name": "Fastboot & ADB",
+      "description": "Fastboot, ADB, နှင့် MiADB tools",
+      "url": "https://drive.google.com/uc?export=download&id=1fWwzJzNzA9gdy8CnOVIUuayC7aTnEb9q",
+      "icon": "fas fa-tools",
+      "color": "green"
+    },
+    {
+      "name": "Unlock Tool Updates",
+      "description": "Latest version releases.",
+      "category": "mobile",
+      "icon": "fa-brands fa-expeditedssl",
+      "color": "orange",
+      "button": {
+        "type": "modal",
+        "target": "unlockToolModal"
+      }
+    },
+    {
+      "category": "mobile",
+      "name": "Mobile Sea Tool",
+      "description": "Latest version releases.",
+      "button": {
+        "type": "modal",
+        "target": "mobileSeaToolModal"
+      },
+      "icon": "fas fa-water",
+      "color": "cyan"
+    },
+    {
+      "category": "mobile",
+      "name": "Huawei FastbootReader",
+      "description": "Huawei device tool.",
+      "url": "https://firebasestorage.googleapis.com/v0/b/sales-dashboard-1100a.firebasestorage.app/o/Huawei%20FastbootReader.7z?alt=media&token=17a316d9-55c7-46db-8577-d25a638bb553",
+      "icon": "fas fa-bolt",
+      "color": "rose"
+    },
+    {
+      "category": "mobile",
+      "name": "Samsung Odin Flash Tool",
+      "description": "Samsung device flashing tool.",
+      "url": "https://firebasestorage.googleapis.com/v0/b/sales-dashboard-1100a.firebasestorage.app/o/Odin3_v3.14.4_skip_md5.rar?alt=media&token=d47f73d0-ab80-43cf-a556-e2ec663f80db",
+      "icon": "fab fa-android",
+      "color": "lime"
+    },
+    {
+      "name": "USB Redirector 1.9.7",
+      "description": "Samung / Xiaomi FRP အတွက် download ပြုလုပ်ပေးပါ။",
+      "category": "mobile",
+      "icon": "fa-brands fa-ideal",
+      "color": "cyan",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/USB%20Redirector%201.9.7(1).rar?alt=media&token=141cfc78-2ec5-44e0-bd61-0e4831a99c9a"
+    },
+    {
+      "name": "iRemoval PRO Premium Edition 5.1 Tool",
+      "description": "IPhone Xs To 16Pro Max ( Wifi Bypass )",
+      "category": "mobile",
+      "icon": "fa-brands fa-apple",
+      "color": "green",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/iRemoval%20PRO%20Premium%20Edition%205.1.zip?alt=media&token=8ab3cf84-6324-411e-9e31-12cae07ff4f7"
+    },
+    {
+      "name": "QC FLASH LOADER TOOL V1.0",
+      "description": "FASTBOOT MODE | EDL MODE ( QC ဖုန်းတေ FW Flash ရတာ | (Xiaomi တေ Global Rom ရေးတဲ့ခါ မြန်တယ် Error မတတ်ဖူး Anti Bypass ပါထည့်ထားတယ်။ သုံးရတာ လွယ်ကူပီး ကျိရတာ ရိုးရှင်းတယ်။ရေးတဲ့ SPEED ကလဲမြန်တယ်။ emmcdl/fhloader 2မျိုးသုံးထားတယ်။)",
+      "category": "mobile",
+      "icon": "fa-brands fa-android",
+      "color": "red",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/QFL.zip?alt=media&token=4b735457-4425-47c5-b720-c60ddefbf35e"
+    },
+    {
+      "name": "Redmi Note 8 Service Tool V2.0",
+      "description": "Bootloader Unlock One Click (Sideload) |Fastboot To Edl (No Need Credit) | No Need Backglass Open | Disable Mi Account One Click (Sideload) |Erase Frp One Click | Fastboot Info | Sideload Info | Firmware Flashing (9008) Fix ",
+      "category": "mobile",
+      "icon": "fa-brands fa-maxcdn",
+      "color": "orange",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/Redmi%20Note%208%20Service%20Tool%20V2.0.zip?alt=media&token=32bfafb7-4d46-46ae-82ae-9cbf861c44ca"
+    },
+    {
+      "name": "XPT_OTA_DISABLE_TOOL",
+      "description": "ALL Model Update Disable tool.",
+      "category": "vpn",
+      "icon": "fa-brands fa-sellcast",
+      "color": "indigo",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/XPT_OTA_DISABLE_TOOL.zip?alt=media&token=4bd8141b-212c-46bc-8a03-b14c223268dd"
+    },
+    {
+      "name": "XIAOMI IMEI FIX ( NV Files )",
+      "description": "Redmi ( 9 / 9a / 10a / 10x4g / note 8pro / note11 4g )",
+      "category": "mobile",
+      "icon": "fa-brands fa-chromecast",
+      "color": "red",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/imei%20fix.zip?alt=media&token=204f7b9c-2973-4d04-8513-66b44819672f"
+    },
+    {
+      "name": "Note8 Sideload Tool",
+      "description": "No Need Backcover ( 9008 )",
+      "category": "vpn",
+      "icon": "fa-brands fa-maxcdn",
+      "color": "orange",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/Note8%20Sideload.zip?alt=media&token=9a2eea4b-0ee4-4f4b-820f-b49843c8cc93"
+    },
+    {
+      "name": "SP_Flash_Tool_XIAOMI ( Auth Bypass Tool )",
+      "description": "",
+      "category": "mobile",
+      "icon": "fa-brands fa-mastodon",
+      "color": "orange",
+      "url": "https://firebasestorage.googleapis.com/v0/b/kkfile-data.firebasestorage.app/o/SP_Flash_Tool_XIAOMI.zip?alt=media&token=94b8173b-86ac-485b-a87d-3f341a7f3e7e"
+    }
+  ]
+}
